@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="baidu-site-verification" content="093lY4ziMu" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="A hexo theme">
+    <meta name="keyword"  content="eternal0918, ZXP">
+    <link rel="shortcut icon" href="/img/ironman-draw.png">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
+    <title>
+        
+          单机Linux搭建Nacos集群 - Eternal
+        
+    </title>
+
+    <link rel="canonical" href="https://dusign.net/2021/08/30/单机Linux搭建Nacos集群/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS --> 
+    
+        
+<link rel="stylesheet" href="/css/dusign-light.css">
+
+        
+<link rel="stylesheet" href="/css/dusign-common-light.css">
+
+        
+<link rel="stylesheet" href="/css/font-awesome.css">
+
+        
+<link rel="stylesheet" href="/css/toc.css">
+
+        <!-- background effects end -->
+    
+    
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    
+<link rel="stylesheet" href="/css/widget.css">
+
+
+    
+<link rel="stylesheet" href="/css/rocket.css">
+
+
+    
+<link rel="stylesheet" href="/css/signature.css">
+
+
+    
+<link rel="stylesheet" href="/css/fonts.googleapis.css">
+
+
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+    <!-- photography -->
+    
+<link rel="stylesheet" href="/css/photography.css">
+
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- background effects start -->
+    
+    <!-- background effects end -->
+
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            
+                background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('../../../../img/default.jpg')
+                /*post*/
+            
+        
+    }
+    
+    #signature{
+        background-image: url('/img/signature/dusign.png');
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Nacos" title="Nacos">Nacos</a>
+                            
+                        </div>
+                        <h1>单机Linux搭建Nacos集群</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by Eternal on
+                            2021-08-30
+                        </span>
+
+                        
+
+                    </div>
+                
+
+                </div>
+            </div>
+        </div>      
+    </div>
+
+    
+    <div class="waveWrapper">
+        <div class="wave wave_before" style="background-image: url('/img/wave-light.png')"></div>
+        <div class="wave wave_after" style="background-image: url('/img/wave-light.png')"></div>
+    </div>
+    
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Eternal</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/categories/">Categories</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/photography/">Photography</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h1 id="单机Linux搭建Nacos集群"><a href="#单机Linux搭建Nacos集群" class="headerlink" title="单机Linux搭建Nacos集群"></a>单机Linux搭建Nacos集群</h1><h1 id="1-单机配置"><a href="#1-单机配置" class="headerlink" title="1.单机配置"></a>1.单机配置</h1><h2 id="基本环境要求"><a href="#基本环境要求" class="headerlink" title="基本环境要求"></a>基本环境要求</h2><ul>
+<li>JDK1.8</li>
+<li>MySQL5.X+（持续化配置文件）</li>
+<li>Nginx（后续搭建集群做负载均衡）</li>
+</ul>
+<h2 id="下载压缩文件"><a href="#下载压缩文件" class="headerlink" title="下载压缩文件"></a>下载压缩文件</h2><p>Nacos官方Git地址：<a href="https://hub.fastgit.org/alibaba/nacos/releases" target="_blank" rel="noopener">https://hub.fastgit.org/alibaba/nacos/releases</a></p>
+<p>shell连接linux服务器，由xftp上传文件至服务器中</p>
+<h2 id="安装Nacos"><a href="#安装Nacos" class="headerlink" title="安装Nacos"></a>安装Nacos</h2><blockquote>
+<p>进入到文件所在目录下进行解压</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf nacos-server-1.2.1.tar.gz</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解压成功后进入文件的bin目录</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> nacos-server-1.2.1/bin</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>由于nacos_config默认以集群方式启动，直接启动会报错，这里通过单机模式启动测试是否安装成功</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh startup.sh -m standalone</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看日志文件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回上一级</span></span><br><span class="line"><span class="built_in">cd</span> ..</span><br><span class="line"><span class="comment"># 进入到log目录下</span></span><br><span class="line"><span class="built_in">cd</span> nacos-server-1.2.1/logs</span><br><span class="line"><span class="comment"># 查看打印出的日志文件内容</span></span><br><span class="line">cat start.out</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>若没有报错，则直接在window浏览器输入：<a href="http://192.168.158.141:8848/nacos" target="_blank" rel="noopener">http://192.168.158.141:8848/nacos</a></p>
+</blockquote>
+<ul>
+<li>登录账户：nacos</li>
+<li>登陆密码：nacos</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829165433554.png" alt="image-20210829165433554"></p>
+<h2 id="修改持续化存储数据库"><a href="#修改持续化存储数据库" class="headerlink" title="修改持续化存储数据库"></a>修改持续化存储数据库</h2><blockquote>
+<p>进入到conf目录下,查看application.properties文件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入conf目录</span></span><br><span class="line"><span class="built_in">cd</span>  nacos-server-1.2.1/conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑 application.properties文件</span></span><br><span class="line">vim application.properties</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>将配置数据库连接的内容添加在最后一行</p>
+</blockquote>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">spring.datasource.platform</span>=<span class="string">mysql</span></span><br><span class="line"></span><br><span class="line"><span class="meta">db.num</span>=<span class="string">1</span></span><br><span class="line"><span class="meta">db.url.0</span>=<span class="string">jdbc:mysql://127.0.0.1:3306/nacos_config?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC</span></span><br><span class="line"><span class="meta">db.user</span>=<span class="string">root</span></span><br><span class="line"><span class="meta">db.password</span>=<span class="string">root</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>创建数据库nacos_config，并执行nacos-mysql.sql脚本</p>
+</blockquote>
+<p>为了方便，这里不再用命令行操作，直接通过navicat连接linux服务器上的MySQL数据库</p>
+<ul>
+<li>打开Navicat，新建连接</li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210830092014791.png" alt="image-20210830092014791"></p>
+<ul>
+<li>创建数据库nacos_config，并执行nacos-mysql.sql脚本</li>
+</ul>
+<p>sql脚本Git地址：<a href="https://hub.fastgit.org/alibaba/nacos/blob/develop/config/src/main/resources/META-INF/nacos-db.sql" target="_blank" rel="noopener">https://hub.fastgit.org/alibaba/nacos/blob/develop/config/src/main/resources/META-INF/nacos-db.sql</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210830092210450.png" alt="image-20210830092210450"></p>
+<h2 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h2><p>确保配置文件持续化存储到数据，运行测试一下</p>
+<blockquote>
+<p>关闭nacos服务，重新启动</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 赋予权限启动</span></span><br><span class="line">chmod u+x *.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#关闭nacos</span></span><br><span class="line"> ./shutdown.sh</span><br><span class="line"> </span><br><span class="line"> <span class="comment"># 启动</span></span><br><span class="line"> sh startup.sh -m standalone</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>进入管理页面添加配置</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829221709658.png" alt="image-20210829221709658"></p>
+<blockquote>
+<p>数据库查看保存到数据库</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829221734174.png" alt="image-20210829221734174"></p>
+<h1 id="2-Nacos集群部署"><a href="#2-Nacos集群部署" class="headerlink" title="2.Nacos集群部署"></a>2.Nacos集群部署</h1><h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><blockquote>
+<p>进入到conf目录下，将<code>cluster.conf.example</code>拷贝一份名为<code>cluster.conf</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看服务器的ip</span></span><br><span class="line"><span class="comment"># 这个IP不能写127.0.0.1</span></span><br><span class="line">[root@node01 bin]<span class="comment"># hostname -I</span></span><br><span class="line">192.168.158.141 192.168.122.1 </span><br><span class="line"></span><br><span class="line"><span class="comment"># 192.168.158.141是写进cluster.conf的ip</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑该文件</span></span><br><span class="line">vim cluster.conf</span><br><span class="line"></span><br><span class="line"><span class="comment">#将以下填进去即可</span></span><br><span class="line">192.168.158.141:3333</span><br><span class="line">192.168.158.141:4444</span><br><span class="line">192.168.158.141:5555</span><br></pre></td></tr></table></figure>
+<h2 id="修改启动脚本"><a href="#修改启动脚本" class="headerlink" title="修改启动脚本"></a>修改启动脚本</h2><blockquote>
+<p>进入到bin目录下，编辑startup.sh</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入到bin目录</span></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑startup.sh</span></span><br><span class="line">vim startup.sh</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>新增一些配置</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 新增之前的</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">getopts</span> <span class="string">":m:f:s:"</span> opt</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">case</span> <span class="variable">$opt</span> <span class="keyword">in</span></span><br><span class="line">        m)</span><br><span class="line">            MODE=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        f)</span><br><span class="line">            FUNCTION_MODE=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        s)</span><br><span class="line">            SERVER=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        ?)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Unknown parameter"</span></span><br><span class="line">        <span class="built_in">exit</span> 1;;</span><br><span class="line">    <span class="keyword">esac</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 新增之后的</span></span><br><span class="line"><span class="keyword">while</span> <span class="built_in">getopts</span> <span class="string">":m:f:s:p:"</span> opt</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="keyword">case</span> <span class="variable">$opt</span> <span class="keyword">in</span></span><br><span class="line">        m)</span><br><span class="line">            MODE=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        f)</span><br><span class="line">            FUNCTION_MODE=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        s)</span><br><span class="line">            SERVER=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        p)</span><br><span class="line">            PORT=<span class="variable">$OPTARG</span>;;</span><br><span class="line">        ?)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Unknown parameter"</span></span><br><span class="line">        <span class="built_in">exit</span> 1;;</span><br><span class="line">    <span class="keyword">esac</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在文件末尾修改</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改之前的</span></span><br><span class="line"><span class="comment"># start</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$JAVA</span> <span class="variable">$&#123;JAVA_OPT&#125;</span>"</span> &gt; <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out 2&gt;&amp;1 &amp;</span><br><span class="line">nohup <span class="variable">$JAVA</span> <span class="variable">$&#123;JAVA_OPT&#125;</span> nacos.nacos &gt;&gt; <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out 2&gt;&amp;1 &amp;</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"nacos is starting，you can check the <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改之后的</span></span><br><span class="line"><span class="comment"># start</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"<span class="variable">$JAVA</span> <span class="variable">$&#123;JAVA_OPT&#125;</span>"</span> &gt; <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out 2&gt;&amp;1 &amp;</span><br><span class="line">nohup <span class="variable">$JAVA</span> -Dserver.port=<span class="variable">$&#123;PORT&#125;</span> <span class="variable">$&#123;JAVA_OPT&#125;</span> nacos.nacos &gt;&gt; <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out 2&gt;&amp;1 &amp;</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"nacos is starting，you can check the <span class="variable">$&#123;BASE_DIR&#125;</span>/logs/start.out"</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>若觉得启动一个nacos所占用内存过大，可以修改内存分配</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> [[ <span class="string">"<span class="variable">$&#123;MODE&#125;</span>"</span> == <span class="string">"standalone"</span> ]]; <span class="keyword">then</span></span><br><span class="line">    JAVA_OPT=<span class="string">"<span class="variable">$&#123;JAVA_OPT&#125;</span> -Xms512m -Xmx512m -Xmn256m"</span></span><br><span class="line">    JAVA_OPT=<span class="string">"<span class="variable">$&#123;JAVA_OPT&#125;</span> -Dnacos.standalone=true"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    JAVA_OPT=<span class="string">"<span class="variable">$&#123;JAVA_OPT&#125;</span> -server -Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=320m"</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>启动测试（在bin目录下）</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 赋予权限启动</span></span><br><span class="line">chmod u+x *.sh</span><br><span class="line"></span><br><span class="line">./startup.sh -P 3333</span><br><span class="line">./startup.sh -P 4444</span><br><span class="line">./startup.sh -P 5555</span><br></pre></td></tr></table></figure>
+<p>访问</p>
+<ul>
+<li><a href="http://192.168.158.141:3333/nacos" target="_blank" rel="noopener">http://192.168.158.141:3333/nacos</a></li>
+<li><a href="http://192.168.158.141:4444/nacos" target="_blank" rel="noopener">http://192.168.158.141:4444/nacos</a></li>
+<li><a href="http://192.168.158.141:5555/nacos" target="_blank" rel="noopener">http://192.168.158.141:5555/nacos</a></li>
+</ul>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829211850627.png" alt="image-20210829211850627"></p>
+<h2 id="Nginx负载均衡"><a href="#Nginx负载均衡" class="headerlink" title="Nginx负载均衡"></a>Nginx负载均衡</h2><blockquote>
+<p>修改nginx配置文件内容</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入到nginx的conf目录下</span></span><br><span class="line"><span class="built_in">cd</span> nginx/conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑 nginx.conf文件</span></span><br><span class="line">vim nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将以下内容，修改进去即可</span></span><br><span class="line">    upstream cluster&#123;</span><br><span class="line">        server 192.168.158.141:3333;</span><br><span class="line">        server 192.168.158.141:4444;</span><br><span class="line">        server 192.168.158.141:5555;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen 1111;</span><br><span class="line">        server_name localhost;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://cluster;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>按照刚刚修改的配置文件来启动nginx</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当前是root，去local的nginx即可</span></span><br><span class="line">whereis nginx</span><br><span class="line">nginx: /usr/bin/nginx /usr/<span class="built_in">local</span>/nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入到local的nginx目录下</span></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/nginx</span><br><span class="line"></span><br><span class="line">[root@node01 nginx]<span class="comment"># ls</span></span><br><span class="line">conf  html  logs  sbin</span><br><span class="line"></span><br><span class="line">[root@node01 nginx]<span class="comment"># cd sbin</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行</span></span><br><span class="line">[root@node01 sbin]<span class="comment"># ./nginx -c /root/application/nginx/conf/nginx.conf</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看nginx启动状态</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep nginx</span><br></pre></td></tr></table></figure>
+<p>启动运行</p>
+<p>输入：<a href="http://192.168.158.141:1111/nacos" target="_blank" rel="noopener">http://192.168.158.141:1111/nacos</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829221357497.png" alt="image-20210829221357497"></p>
+<h2 id="案例测试"><a href="#案例测试" class="headerlink" title="案例测试"></a>案例测试</h2><p>搭建一个简单的springboot项目</p>
+<p>依赖添加</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--spring cloud alibaba 2.1.0.RELEASE--&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-alibaba-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!--SpringCloud ailibaba nacos --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- SpringBoot整合Web组件 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-actuator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">optional</span>&gt;</span>true<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>配置文件添加</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">9002</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">nacos-payment-provider</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">nacos:</span></span><br><span class="line">      <span class="attr">discovery:</span></span><br><span class="line">        <span class="comment">#配置本地Nacos地址，这个是window下的nacos默认端口</span></span><br><span class="line">        <span class="comment">#server-addr: localhost:8848</span></span><br><span class="line">        <span class="comment"># 换成nginx的1111端口，做集群</span></span><br><span class="line">        <span class="attr">server-addr:</span> <span class="number">192.168</span><span class="number">.158</span><span class="number">.141</span><span class="string">:1111</span></span><br><span class="line"></span><br><span class="line"><span class="attr">management:</span></span><br><span class="line">  <span class="attr">endpoints:</span></span><br><span class="line">    <span class="attr">web:</span></span><br><span class="line">      <span class="attr">exposure:</span></span><br><span class="line">        <span class="attr">include:</span> <span class="string">'*'</span></span><br></pre></td></tr></table></figure>
+<p>业务类随便写一个就可以</p>
+<p>启动项目运行</p>
+<p><strong>查看服务列表（服务已成功注册）</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210829222625069.png" alt="image-20210829222625069"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/eternal0918/mdimages.github.io/img/image-20210830101022598.png" alt="image-20210830101022598"></p>
+
+                
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/2021/08/11/RabbitMQ-学习/" data-toggle="tooltip" data-placement="top" title="RabbitMQ 学习">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                <!-- tip start -->
+                
+
+                
+                <div class="comment_notes">
+                    <p>
+                        This is copyright.
+                    </p>
+                </div>
+                
+                <!-- tip end -->
+
+                <!-- Music start-->
+                
+                
+<link rel="stylesheet" href="/css/music-player/fonts/iconfont.css">
+
+
+<link rel="stylesheet" href="/css/music-player/css/reset.css">
+
+
+<link rel="stylesheet" href="/css/music-player/css/player.css">
+
+
+<div class="music-player">
+    <audio class="music-player__audio" ></audio>
+    <div class="music-player__main">
+        <div class="music-player__blur"></div>
+        <div class="music-player__disc">
+            <div class="music-player__image">
+                <img width="100%" src="" alt="">
+            </div>
+            <div class="music-player__pointer"><img width="100%" src="/img/cd_tou.png" alt=""></div>
+        </div>
+        <div class="music-player__controls">
+            <div class="music__info">
+                <h3 class="music__info--title">...</h3>
+                <p class="music__info--singer">...</p>
+            </div>
+            <div class="player-control">
+                <div class="player-control__content">
+                    <div class="player-control__btns">
+                        <div class="player-control__btn player-control__btn--prev"><i class="iconfont icon-prev"></i></div>
+                        <div class="player-control__btn player-control__btn--play"><i class="iconfont icon-play"></i></div>
+                        <div class="player-control__btn player-control__btn--next"><i class="iconfont icon-next"></i></div>
+                        <div class="player-control__btn player-control__btn--mode"><i class="iconfont icon-loop"></i></div>
+                    </div>
+                    <div class="player-control__volume">
+                        <div class="control__volume--icon player-control__btn"><i class="iconfont icon-volume"></i></div>
+                        <div class="control__volume--progress player_progress"></div>
+                    </div>
+                </div>
+                <div class="player-control__content">
+                    <div class="player__song--progress player_progress"></div>
+                    <div class="player__song--timeProgess nowTime">00:00</div>
+                    <div class="player__song--timeProgess totalTime">00:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/music-player/utill.js"></script>
+
+
+<script src="/js/music-player/jquery.min.js"></script>
+
+<!-- netease; qqkg -->
+<!--
+<script src="/js/music-player/player.js?library=config.music.library.js"></script>
+-->
+<script src="../../../../js/music-player/player.js?library=netease&music=https://music.163.com/#/playlist?id=5380610670&userid=340389419"></script>
+                
+                <!-- Music end -->
+
+                <!-- Sharing -->
+                
+                <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                <!--  css & js -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!-- Sharing -->
+
+                <!-- gitment start -->
+                
+                <!-- gitment end -->
+
+                <!-- 来必力City版安装代码 -->
+                
+                <!-- City版安装代码已完成 -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+    
+      
+        <aside id="sidebar">
+          <div id="toc" class="toc-article">
+          <strong class="toc-title">Contents</strong>
+          
+            
+              <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#单机Linux搭建Nacos集群"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">单机Linux搭建Nacos集群</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#1-单机配置"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">1.单机配置</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#基本环境要求"><span class="toc-nav-number">2.1.</span> <span class="toc-nav-text">基本环境要求</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#下载压缩文件"><span class="toc-nav-number">2.2.</span> <span class="toc-nav-text">下载压缩文件</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#安装Nacos"><span class="toc-nav-number">2.3.</span> <span class="toc-nav-text">安装Nacos</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#修改持续化存储数据库"><span class="toc-nav-number">2.4.</span> <span class="toc-nav-text">修改持续化存储数据库</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#运行测试"><span class="toc-nav-number">2.5.</span> <span class="toc-nav-text">运行测试</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#2-Nacos集群部署"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">2.Nacos集群部署</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#修改配置文件"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">修改配置文件</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#修改启动脚本"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">修改启动脚本</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Nginx负载均衡"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">Nginx负载均衡</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#案例测试"><span class="toc-nav-number">3.4.</span> <span class="toc-nav-text">案例测试</span></a></li></ol></li></ol>
+            
+          
+          </div>
+        </aside>
+      
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Nacos" title="Nacos">Nacos</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://blog.csdn.net/d_Nail" target="_blank">Dusign&#39;s Blog</a></li>
+                    
+                        <li><a href="https://github.com/eternal0918" target="_blank">Eternal&#39;s Github</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+
+
+<style  type="text/css">
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/eternal0918">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://gitee.com/dont-leave-the-old/eternal">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-git fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.facebook.com/Gang Du">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/hong-yan-76-83">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Eternal 2021 
+                    <br>
+                    Powered by 
+                    <a href="https://github.com/eternal0918/eternal0918.github.io" target="_blank" rel="noopener">
+                        <i>eternal.github.io</i>
+                    </a> | 
+                    <iframe name="star" style="margin-left: 2px; margin-bottom:-5px;" frameborder="0" scrolling="0"
+                        width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=eternal0918&repo=eternal0918.github.io&type=star&count=true">
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- Search -->
+
+<script src="/js/search.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://dusign.net/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Search -->
+
+    <script type="text/javascript">      
+        var search_path = "search.xml";
+        if (search_path.length == 0) {
+            search_path = "search.xml";
+        }
+    var path = "/" + search_path;
+    searchFunc(path, 'local-search-input', 'local-search-result');
+    </script>
+
+
+<!-- busuanzi -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+
+    
+        <!-- background effects line -->
+        
+
+        
+            <script type="text/javascript" src="/js/mouse-click.js" content='[&quot;🌱&quot;,&quot;just do it&quot;,&quot;🍀&quot;]' color='[&quot;rgb(121,93,179)&quot; ,&quot;rgb(76,180,231)&quot; ,&quot;rgb(184,90,154)&quot;]'></script>
+        
+
+        <!-- background effects end -->
+    
+
+    <!--<script size="50" alpha='0.3' zIndex="-999" src="/js/ribbonStatic.js"></script>-->
+    
+        <script src="/js/ribbonDynamic.js"></script>
+    
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+
+</html>
